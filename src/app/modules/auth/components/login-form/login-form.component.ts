@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { faPen, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { RequestStatus } from '@models/request-status.model';
 import { AuthService } from '@services/auth.service';
@@ -11,6 +11,7 @@ import { AuthService } from '@services/auth.service';
 })
 export class LoginFormComponent {
   private readonly _authService = inject(AuthService);
+  private readonly _activatedRouter = inject(ActivatedRoute);
 
   form = this.formBuilder.nonNullable.group({
     email: ['', [Validators.email, Validators.required]],
@@ -22,7 +23,18 @@ export class LoginFormComponent {
   showPassword = false;
   status: RequestStatus = 'init';
 
-  constructor(private formBuilder: FormBuilder, private router: Router) {}
+  constructor(private formBuilder: FormBuilder, private router: Router) {
+    this.preloadEmail();
+  }
+
+  preloadEmail() {
+    this._activatedRouter.queryParamMap.subscribe((params) => {
+      const email = params.get('email');
+      if (email) {
+        this.form.controls.email.setValue(email);
+      }
+    });
+  }
 
   doLogin() {
     if (this.form.valid) {

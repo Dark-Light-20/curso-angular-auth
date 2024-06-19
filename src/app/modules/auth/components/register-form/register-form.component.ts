@@ -14,6 +14,10 @@ import { CustomValidators } from '@utils/validators';
 export class RegisterFormComponent {
   private readonly _authService = inject(AuthService);
 
+  formUser = this.formBuilder.nonNullable.group({
+    email: ['', [Validators.email, Validators.required]],
+  });
+
   form = this.formBuilder.nonNullable.group(
     {
       name: ['', [Validators.required]],
@@ -28,10 +32,12 @@ export class RegisterFormComponent {
     }
   );
   status: RequestStatus = 'init';
+  statusUser: RequestStatus = 'init';
   faEye = faEye;
   faEyeSlash = faEyeSlash;
   showPassword = false;
   responseError = '';
+  showRegister = false;
 
   constructor(private formBuilder: FormBuilder, private router: Router) {}
 
@@ -56,6 +62,29 @@ export class RegisterFormComponent {
       });
     } else {
       this.form.markAllAsTouched();
+    }
+  }
+
+  validateUser() {
+    if (this.formUser.valid) {
+      this.statusUser = 'loading';
+      const { email } = this.formUser.getRawValue();
+      this._authService.isAvailable(email).subscribe({
+        next: (response) => {
+          this.statusUser = 'success';
+          if (response.isAvailable) {
+            this.form.controls.email.setValue(email);
+            this.showRegister = true;
+          } else {
+            this.router.navigate(['/login'], {
+              queryParams: { email },
+            });
+          }
+        },
+        error: () => (this.statusUser = 'failed'),
+      });
+    } else {
+      this.formUser.markAllAsTouched();
     }
   }
 }
