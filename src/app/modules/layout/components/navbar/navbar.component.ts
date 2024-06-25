@@ -7,6 +7,7 @@ import {
   faAngleDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '@services/auth.service';
+import { TokenService } from '@services/token.service';
 
 @Component({
   selector: 'app-navbar',
@@ -14,6 +15,7 @@ import { AuthService } from '@services/auth.service';
 })
 export class NavbarComponent {
   private readonly _authService = inject(AuthService);
+  private readonly _tokenService = inject(TokenService);
   private readonly _router = inject(Router);
 
   faBell = faBell;
@@ -29,5 +31,9 @@ export class NavbarComponent {
   logout() {
     this._authService.logout();
     this._router.navigateByUrl('/login');
+  }
+
+  isValidToken() {
+    console.log(this._tokenService.isValidToken());
   }
 }
