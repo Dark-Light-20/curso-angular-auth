@@ -5,6 +5,7 @@ import { BehaviorSubject, switchMap, tap } from 'rxjs';
 import { TokenService } from './token.service';
 import { ResponseLogin } from '@models/auth.model';
 import { User } from '@models/user.model';
+import { checkToken } from '@interceptors/token.interceptor';
 
 @Injectable({
   providedIn: 'root',
@@ -68,11 +69,8 @@ export class AuthService {
   }
 
   getProfile() {
-    const token = this._tokenService.getToken();
     return this._http
-      .get<User>(`${this._apiUrl}/auth/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .get<User>(`${this._apiUrl}/auth/profile`, { context: checkToken() })
       .pipe(tap((user) => this.user$.next(user)));
   }
 }
