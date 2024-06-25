@@ -1,19 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TokenService {
+  private readonly _cookieService = inject(CookieService);
+
   saveToken(token: string) {
-    localStorage.setItem('token', token);
+    this._cookieService.set('token-trello', token, 1, '/');
   }
 
   getToken() {
-    const token = localStorage.getItem('token');
+    const token = this._cookieService.get('token-trello');
     return token;
   }
 
   removeToken() {
-    localStorage.removeItem('token');
+    this._cookieService.delete('token-trello');
   }
 }
