@@ -17,6 +17,6 @@ export class TokenService {
   }
 
   removeToken() {
-    this._cookieService.delete('token-trello');
+    this._cookieService.delete('token-trello', '/');
   }
 }
