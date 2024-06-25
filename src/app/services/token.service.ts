@@ -35,4 +35,32 @@ export class TokenService {
     }
     return false;
   }
+
+  saveRefreshToken(token: string) {
+    this._cookieService.set('refresh-token-trello', token, 1, '/');
+  }
+
+  getRefreshToken() {
+    const token = this._cookieService.get('refresh-token-trello');
+    return token;
+  }
+
+  removeRefreshToken() {
+    this._cookieService.delete('refresh-token-trello', '/');
+  }
+
+  isValidRefreshToken() {
+    const token = this.getRefreshToken();
+    if (!token) {
+      return false;
+    }
+    const decodeToken = jwtDecode<JwtPayload>(token);
+    if (decodeToken?.exp) {
+      const tokenDate = new Date(0);
+      tokenDate.setUTCSeconds(decodeToken.exp);
+      const today = new Date();
+      return tokenDate.getTime() > today.getTime();
+    }
+    return false;
+  }
 }

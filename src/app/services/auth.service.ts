@@ -24,7 +24,23 @@ export class AuthService {
         password,
       })
       .pipe(
-        tap((response) => this._tokenService.saveToken(response.access_token))
+        tap((response) => {
+          this._tokenService.saveToken(response.access_token);
+          this._tokenService.saveRefreshToken(response.refresh_token);
+        })
+      );
+  }
+
+  refreshToken(refreshToken: string) {
+    return this._http
+      .post<ResponseLogin>(`${this._apiUrl}/auth/refresh-token`, {
+        refreshToken,
+      })
+      .pipe(
+        tap((response) => {
+          this._tokenService.saveToken(response.access_token);
+          this._tokenService.saveRefreshToken(response.refresh_token);
+        })
       );
   }
 
